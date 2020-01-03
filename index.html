@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Würfel</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <style>
+    .hidden {
+      display: none !important;
+    }
+  </style>
+
+  <script>
+    let minInput;
+    let maxInput;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      minInput = document.querySelector('#minInput');
+      maxInput = document.querySelector('#maxInput');
+
+      minInput.addEventListener('change', checkInputData);
+      maxInput.addEventListener('change', checkInputData);
+      document.querySelector('#submitButton').addEventListener('click', playDice);
+
+      checkInputData();
+    });
+
+    const numberRegex = /^\d*$/;
+
+    function checkInputData() {
+      let isValid = false;
+
+      if (!numberRegex.test(minInput.value) ||
+        +minInput.value < 1 ||
+        +minInput.value >= +maxInput.value
+      ) {
+        isValid = false;
+        document.querySelector('#minInputFeedback').style.display = 'block';
+      } else {
+        isValid = true;
+        document.querySelector('#minInputFeedback').style.display = 'none';
+      }
+
+      document.querySelector('#submitButton').disabled = !isValid;
+    }
+
+    function playDice() {
+      document.querySelector('#result-table').classList.remove('hidden');
+      document.querySelector('#input-area').classList.add('hidden');
+
+      let sum = +minInput.value;
+      let id = 0;
+
+      addRow(++id, '', sum);
+
+      while (sum != +maxInput.value) {
+        const addend = random(1, +maxInput.value);
+
+        console.log('sum, addend', sum, addend);
+        
+        if (sum + addend <= +maxInput.value) {
+          sum += addend;
+          addRow(++id, addend, sum);
+        }
+      }
+
+      document.querySelector('#spinner').classList.add('hidden');
+    }
+
+    function random(min, max) { // min and max included 
+      return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    function addRow(id, addend, sum) {
+      const row = document.createElement('tr');
+      const idCol = document.createElement('th');
+      const addendCol = document.createElement('td');
+      const sumCol = document.createElement('td');
+
+      idCol.innerText = id;
+      addendCol.innerText = addend;
+      sumCol.innerText = sum;
+
+      row.appendChild(idCol);
+      row.appendChild(addendCol);
+      row.appendChild(sumCol);
+      document.querySelector('#result-body').appendChild(row);
+    }
+  </script>
+</head>
+
+<body>
+  <div class="container-md">
+    <h1>Würfel</h1>
+    <div id="input-area">
+      <h2>Bereich definieren</h2>
+      <div class="form-group">
+        <label for="minInput">Min.-Wert</label>
+        <input type="number" class="form-control" id="minInput" aria-describedby="minInputDescription" value="0">
+        <small id="minInputDescription" class="form-text text-muted">Ganze Zahl, muss größer 0 und kleiner als Max.-Wert
+          sein.</small>
+        <div class="invalid-feedback" id="minInputFeedback">
+          Min.-Wert entspricht nicht der Vorgabe: Ganze Zahl, muss größer 0 und kleiner als Max.-Wert sein.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="maxInput">Max.-Wert</label>
+        <input type="number" class="form-control" id="maxInput" aria-describedby="maxInputDescription" value="100">
+        <small id="maxInputDescription" class="form-text text-muted">Muss eine ganze Zahl sein.</small>
+      </div>
+      <button type="button" class="btn btn-primary" id="submitButton" disabled>würfeln</button>
+    </div>
+
+    <div class="hidden" id="result-table">
+      <h2>Ergebnisse</h2>
+      <div class="d-flex justify-content-center" id="spinner">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">gewürfelte Zahl</th>
+            <th scope="col">Summe</th>
+          </tr>
+        </thead>
+        <tbody id="result-body">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
